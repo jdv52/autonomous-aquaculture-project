@@ -2,31 +2,33 @@
 #include "Crane.h"
 #include <unity.h>
 
+void setUp()
+{
+}
+
+void tearDown()
+{
+}
+
 // Test normal state transitions
 void test_state_transitions()
 {
-    Crane crane;
-
+    Crane crane(new NoConnection);
+    TEST_ASSERT_EQUAL_STRING("No Connection", crane.getState().c_str());
     // Test transition to LowPower
-    crane.changeState(new Normal());
-    TEST_ASSERT_EQUAL()
-
-    // Reset and test transition to NoConnection
-    crane.currentState = &normal;
-    normal.changeToNoConnection(crane);
-    TEST_ASSERT_EQUAL_PTR(&NoConnection::getInstance(), crane.currentState);
+    crane.transitionTo(new Normal);
+    TEST_ASSERT_EQUAL_STRING("Normal", crane.getState().c_str());
+    crane.transitionTo(new LowPower);
+    TEST_ASSERT_EQUAL_STRING("Low Power", crane.getState().c_str());
+    crane.transitionTo(new Both);
+    TEST_ASSERT_EQUAL_STRING("Both", crane.getState().c_str());
 }
 
-// Test singleton behavior
-void test_singleton_instances()
+int main()
 {
-    Normal &a = Normal::getInstance();
-    Normal &b = Normal::getInstance();
-    TEST_ASSERT_EQUAL_PTR(&a, &b);
+    UNITY_BEGIN();
+    RUN_TEST(test_state_transitions);
 
-    LowPower &lp1 = LowPower::getInstance();
-    LowPower &lp2 = LowPower::getInstance();
-    TEST_ASSERT_EQUAL_PTR(&lp1, &lp2);
+    // Add more test runners here
+    return UNITY_END();
 }
-
-// Add more test cases for other states and methods

@@ -15,49 +15,30 @@
 #define CRANESTATE_H
 #include "Crane.h"
 
-class Crane;        // Forward declaration of Crane class
-class Normal;       // Forward declaration of Normal state class
-class LowPower;     // Forward declaration of LowPower state class
-class NoConnection; // Forward declaration of NoConnection state class
-class Both;         // Forward declaration of Both state class
+class Crane;
+class Normal;
+class LowPower;
+class NoConnection;
+class Both;
 
 class CraneState
 {
 protected:
-    std::string state;
-    Crane contextRef;
+    Crane *contextRef;
 
 public:
-    // Default constructor
-    CraneState() = default;
-    CraneState(Crane &context)
+    virtual ~CraneState() = default;
+
+    void set_context(Crane *context)
     {
-        this->state = "null";
         this->contextRef = context;
     }
-    virtual ~CraneState() = default;
+
+    virtual std::string getState();
     virtual void checkPower(Crane &context) = 0;
     virtual void sendData(Crane &context) = 0;
     virtual void winchControl(Crane &context) = 0;
     virtual void listen(Crane &context) = 0;
-    inline std::string getState() { return this->state; }
-    // State transition methods
-    void changeToNormal(Crane &context)
-    {
-        context.changeState(new Normal(context));
-    }
-    void changeToLowPower(Crane &context)
-    {
-        context.changeState(new LowPower(context));
-    }
-    void changeToNoConnection(Crane &context)
-    {
-        context.changeState(new NoConnection(context));
-    }
-    void changeToBoth(Crane &context)
-    {
-        context.changeState(new Both(context));
-    }
 };
 
 /*
@@ -67,10 +48,9 @@ public:
 class Normal : public CraneState
 {
 public:
-    Normal(Crane &context)
+    std::string getState()
     {
-        this->state = "Normal";
-        this->contextRef = context;
+        return "Normal";
     }
     void checkPower(Crane &context) override;
     void sendData(Crane &context) override;
@@ -84,29 +64,14 @@ public:
 class LowPower : public CraneState
 {
 public:
-    LowPower(Crane &context)
+    std::string getState()
     {
-        this->state = "Low Power";
-        this->contextRef = context;
+        return "Low Power";
     }
-    void checkPower(Crane &c) override
-    {
-        // Implementation for LowPower state
-    }
-
-    void sendData(Crane &c) override
-    {
-        // Implementation for LowPower state
-    }
-
-    void winchControl(Crane &c) override;
-
-    void listen(Crane &c) override
-    {
-        // TODO: Implement low power state listening functionality
-        // TODO: Minimize power consumption while listening
-        return;
-    }
+    void checkPower(Crane &context) override;
+    void sendData(Crane &context) override;
+    void winchControl(Crane &context) override;
+    void listen(Crane &context) override;
 };
 
 /*
@@ -115,37 +80,14 @@ public:
 class NoConnection : public CraneState
 {
 public:
-    NoConnection(Crane &context)
+    std::string getState()
     {
-        this->state = "No Connection";
-        this->contextRef = context;
+        return "No Connection";
     }
-    static NoConnection *getInstance()
-    {
-        static NoConnection *instance = new NoConnection();
-        return instance;
-    }
-
-    void checkPower(Crane &c) override
-    {
-        // Implementation for NoConnection state
-    }
-
-    void sendData(Crane &c) override
-    {
-        // Implementation for NoConnection state
-        // it should probably do this to "reconnect"
-    }
-
-    void winchControl(Crane &c) override;
-
-    void listen(Crane &c) override
-    {
-        // TODO: Implement no connection state listening functionality
-        // TODO: Periodically check for connection restoration
-    }
-
-    void timerWinchControl(Crane &c);
+    void checkPower(Crane &context) override;
+    void sendData(Crane &context) override;
+    void winchControl(Crane &context) override;
+    void listen(Crane &context) override;
 };
 
 /*
@@ -154,30 +96,14 @@ public:
 class Both : public CraneState
 {
 public:
-    Both(Crane &context)
+    std::string getState()
     {
-        this->state = "Both";
-        this->contextRef = context;
+        return "Both";
     }
-    static Both *getInstance()
-    {
-        static Both *instance = new Both();
-        return instance;
-    }
-
-    void checkPower(Crane &c) override
-    {
-        // Implementation for Both state
-    }
-
-    void sendData(Crane &c) override
-    {
-        // Implementation for Both state
-    }
-
-    void winchControl(Crane &c) override;
-
-    void listen(Crane &c) override;
+    void checkPower(Crane &context) override;
+    void sendData(Crane &context) override;
+    void winchControl(Crane &context) override;
+    void listen(Crane &context) override;
 };
 
 #endif // CRANESTATE_H
