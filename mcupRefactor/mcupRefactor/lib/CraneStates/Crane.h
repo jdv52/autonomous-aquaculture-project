@@ -10,25 +10,17 @@
  */
 #ifndef CRANE_H
 #define CRANE_H
-#include "CraneState.h"
 #include "ArduinoJson.h"
+#include "CraneState.h"
+
 // macros
 #define NUM_WINCHES 10
 
+// Forward declaration
+class CraneState;
+
 class Crane
 {
-public:
-    Crane();
-    ~Crane();
-
-    void initialize();
-
-    void changeState(CraneState &newState)
-    {
-        delete currentState;
-        currentState = &newState;
-    }
-
 private:
     CraneState *currentState;
     bool liftFlag[NUM_WINCHES];
@@ -38,6 +30,20 @@ private:
     unsigned long lastDevSwitchTime;
     JsonDocument doc;
     // data structure to hold crane's power measurements, and the time at which they were taken
+public:
+    Crane()
+    {
+        this->currentState = new Both();
+    }
+    ~Crane();
+
+    void initialize();
+
+    void changeState(CraneState *newState)
+    {
+        delete currentState;
+        currentState = newState;
+    }
 };
 
 #endif // CRANE_H
